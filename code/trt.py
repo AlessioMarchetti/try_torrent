@@ -18,14 +18,13 @@ def send_request(name):
     try:
         url = urlparse(d[b'announce'].decode('UTF-8'))
     except KeyError:
-        #Ignore
+        #Error: announce key not found in .torrent file
         #print('{}.........Announce not found.'.format(name))
         return
 
-    #print(url.geturl())
-
     if not url.scheme == 'http':
-        # ignore
+        # Error: the tracker is not http
+        # @todo: 
         # print('{}........Not http: {}'.format(name, url.scheme))
         return
 
@@ -50,7 +49,7 @@ def send_request(name):
         return
 
     try:
-        bencoder.decode(r.text)
+        bencoder.decode(r.content)
     except:
         print('{}..........Bencode not valid'.format(name))
         fname = d[b'info'][b'name'].decode('utf-8')

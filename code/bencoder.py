@@ -49,7 +49,6 @@ def encode(obj):
     raise ValueError("Allowed types: int, bytes, list, dict; not %s", type(obj))
 
 def decode(s):
-    print('EHY')
     """
     Decodes given bencoded bytes object.
 
@@ -89,6 +88,7 @@ def decode(s):
 
     if isinstance(s, str):
         s = s.encode("ascii")
+
 
     ret, rest = decode_first(s)
     if rest:
