@@ -44,7 +44,7 @@ def send_request(name):
         r = requests.get(url.geturl(), params=pl)
     except:
         #ignore
-        #print('{}.........Error'.format(name))
+        print('{}.........Error'.format(name))
         #print(r.text)
         #r.raise_for_status()
         return
@@ -53,13 +53,16 @@ def send_request(name):
         bencoder.decode(r.text)
     except:
         print('{}..........Bencode not valid'.format(name))
+        fname = d[b'info'][b'name'].decode('utf-8')
+        with open('../res/out/{}.log'.format(fname), 'wb') as mfile:
+            mfile.write(r.content)
         return
     #print('-------RESULT-------')
     #print(r.text)
     print('{}.......OK'.format(name))
 
 
-mypath = 'torrent/'
+mypath = '../res/torrent/'
 files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 for fil in files:
     send_request(mypath+fil)
