@@ -9,10 +9,10 @@ from os.path import isfile, join
 
 
 def send_request(name):
-    '''
+    """
     send the request for the peer list to the tracker specified by the name
         .torrent file.
-    '''
+    """
 
     # get the text of the .torrent file
     with open(name, 'rb') as f:
@@ -33,33 +33,38 @@ def send_request(name):
         # print('{}.........Announce not found.'.format(name))
         return
 
-    # check the protocol
-    if not url.scheme == 'http':
-        # Error: the tracker is not http
-        # @todo: implement udp protocol request
-        # print('{}........Not http: {}'.format(name, url.scheme))
-        return
+    def http_request(url, sha1sum):
+        # initialize the dictionary with the params to send to the tracker
+        pl = {}
+        pl['uploaded'] = 0
+        pl['downloaded'] = 0
+        pl['event'] = 'started'
+        pl['peer_id'] = '12345asr987654321234'
+        pl['info_hash'] = sha1sum
+        pl['left'] = 0
+        pl['port'] = 6881
+        pl['compact'] = 1
 
-    # initialize the dictionary with the params to send to the tracker
-    pl = {}
-    pl['uploaded'] = 0
-    pl['downloaded'] = 0
-    pl['event'] = 'started'
-    pl['peer_id'] = '12345asr987654321234'
-    pl['info_hash'] = sha1sum
-    pl['left'] = 0
-    pl['port'] = 6881
-    pl['compact'] = 1
-
-    # send the HTTP GET request
-    # r is the value returned
-    try:
+        # send the HTTP GET request
         r = requests.get(url.geturl(), params=pl)
-    except:
-        #ignore
-        print('{}.........Error'.format(name))
-        #print(r.text)
-        #r.raise_for_status()
+        return r
+
+    # check the protocol
+    if url.scheme == 'http':
+        try:
+            r = http_request(url, sha1sum)
+        except:
+            #ignore
+            print('{}.........Error'.format(name))
+            #print(r.text)
+            #r.raise_for_status()
+            return None
+    elif url.scheme == 'udp':
+        # todo: implement udp
+        return
+    else:
+        # Error: the tracker is not http or udp
+        # print('{}........Not http: {}'.format(name, url.scheme))
         return
 
     # try to decode the return
